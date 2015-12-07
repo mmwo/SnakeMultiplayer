@@ -1,12 +1,14 @@
 <?php
 
 namespace Games\SnakeBundle\RPC;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Voryx\ThruwayBundle\Annotation\Register;
-
-class MoveRpc extends Controller{
+use Voryx\ThruwayBundle\Annotation\Worker;
+/**
+ * @Worker("move-snake")
+ */
+class MoveRpc extends RpcController{
     /**
-     * @Register("games.snake.move",serializerEnableMaxDepthChecks=true, worker="move-snake")
+     * @Register("games.snake.move",serializerEnableMaxDepthChecks=true)
      */
     public function makeAction($requestData){
         $requestData = (object)$requestData;
@@ -36,19 +38,8 @@ class MoveRpc extends Controller{
                                 "score" => $player->getScore(),
                                 "className" => $player->getClass(),
                             ));
-        $this->publish($params);
+        $this->publish("games.snake.game",$params);
         
         return array("ingame"=>$player->isInGame());
-    }
-    protected function publish(array $data) {
-        $client = $this->get("thruway.client");
-
-        $client->publish("games.snake.game", [$data],[],["acknowledge" => true])->then(
-        function($response){
-        //  success function 
-        },
-        function($error){
-            $this->get->logger->info(json_encode($error));  // log errors
-        });
     }
 }

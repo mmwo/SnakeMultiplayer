@@ -1,13 +1,16 @@
 <?php
 
 namespace Games\SnakeBundle\RPC;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Voryx\ThruwayBundle\Annotation\Register;
 use Thruway\Authentication\AuthenticationManager;
+use Voryx\ThruwayBundle\Annotation\Worker;
 
-class PingPong extends Controller{
+/**
+ * @Worker("pingpong-snake")
+ */
+class PingPong extends RpcController{
     /**
-     * @Register("games.snake.activity",serializerEnableMaxDepthChecks=true, worker="pingpong-snake")
+     * @Register("games.snake.activity",serializerEnableMaxDepthChecks=true, )
      */
     public function pingpong($requestData){
 
@@ -18,19 +21,11 @@ class PingPong extends Controller{
         
         $salt = $this->getParameter("salt.of.awesomeness");
         
-        $this->publish(array("id"=> base64_encode(crypt($requestData->sessionId,$salt)),
+        $this->publish("games.snake.game", array("id"=> base64_encode(crypt($requestData->sessionId,$salt)),
                              "data" => array("name" => $requestData->name,
                                              "time"=> $requestData->time
                         )));
     }
-    protected function publish(array $data) {
-        $client = $this->get("thruway.client");
-        
-        $client->publish("games.snake.game", [$data],[],["acknowledge" => true])->then(
-        function($response){},
-        function($error){
-            $this->get('logger')->info(json_encode($error));
-        });
-    }
+
     
 }

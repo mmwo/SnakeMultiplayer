@@ -1,19 +1,20 @@
 <?php
 
 namespace Games\SnakeBundle\RPC;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Voryx\ThruwayBundle\Annotation\Register;
+use Voryx\ThruwayBundle\Annotation\Worker;
 use Games\SnakeBundle\Utils\SnakePlayer;
-
-class AddPlayerRpc extends Controller{
+/**
+ * @Worker("add-snake")
+ */
+class AddPlayerRpc extends RpcController{
     
     /**
-     * @Register("games.snake.newplayer",serializerEnableMaxDepthChecks=true, worker="add-snake")
+     * @Register("games.snake.newplayer",serializerEnableMaxDepthChecks=true)
      */
     public function addPlayer($requestData){
         $requestData = (object)$requestData;
         if(property_exists($requestData, "test")){
-            $this->get("logger")->info("test message received");
             return array("response"=>true);
         }
         
@@ -31,7 +32,7 @@ class AddPlayerRpc extends Controller{
         }
         
 
-        $this->publish(array("id" => $id,
+        $this->publish("games.snake.game", array("id" => $id,
                             "data" => array(
                                             "body" => $player->getBody(),
                                             "ingame" => $player->isInGame(),
@@ -44,16 +45,6 @@ class AddPlayerRpc extends Controller{
                      "direction"=>$player->getBody()[0]->d,
                      "className" => $player->getClass(),
                     );
-    }
-    
-    protected function publish(array $data) {
-        $client = $this->get("thruway.client");
-        $client->publish("games.snake.game", [$data],[],
-        ["acknowledge" => true])->then(
-            function(){},
-            function($error){
-                $this->get('logger')->info(json_encode($error));
-        });
     }
      
 }

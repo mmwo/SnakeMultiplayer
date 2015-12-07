@@ -1,14 +1,17 @@
 <?php
 
 namespace Games\SnakeBundle\RPC;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Voryx\ThruwayBundle\Annotation\Register;
+use Voryx\ThruwayBundle\Annotation\Worker;
 
-class StartGameRpc extends Controller{
+/**
+ * @Worker("start-game-snake")
+ */
+class StartGameRpc extends RpcController{
     
     
     /**
-     * @Register("games.snake.startgame",serializerEnableMaxDepthChecks=true, worker="start-game-snake")
+     * @Register("games.snake.startgame",serializerEnableMaxDepthChecks=true)
      */
     public function startGame($requestData){
         $requestData = (object)$requestData;
@@ -25,7 +28,7 @@ class StartGameRpc extends Controller{
             $pM->resetGame($snakeInitLocations);
             
 
-            $this->publish(array("gameCreation" => true));
+            $this->publish("games.snake.game", array("gameCreation" => true));
 
             return array("availability"=> true); 
         }else{
@@ -33,14 +36,5 @@ class StartGameRpc extends Controller{
         }
        
     }
-    
-    protected function publish(array $data) {
-        $client = $this->get("thruway.client");
-        $client->publish("games.snake.game", [$data],[],
-        ["acknowledge" => true])->then(
-            function(){},
-            function($error){
-                $this->get('logger')->info(json_encode($error));
-        });
-    }     
+     
 }
