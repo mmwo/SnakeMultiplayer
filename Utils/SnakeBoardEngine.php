@@ -32,7 +32,7 @@ class SnakeBoardEngine {
             }
         }
     }
-    public function isBorder($board, $x, $y){
+    public function isBorder(SnakeBoard $board, $x, $y){
         if(($x >= 0 && $x <= $board::boardWidth)
           && ($y >= 0 && $y <= $board::boardHeight))
         {

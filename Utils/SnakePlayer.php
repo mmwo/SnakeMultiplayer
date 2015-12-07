@@ -42,15 +42,11 @@ class SnakePlayer extends AbstractPlayer {
     public function isInGame(){
         return $this->inGame;
     }
-    public function getScore() {
-        return $this->score;
-    }
+
     public function addExtra() {
         $this->extra = true;
     }
-    public function incScore($points) {
-        $this->score +=$points;
-    }
+
     
     public function setModule($module){
         array_unshift($this->body, $module);
