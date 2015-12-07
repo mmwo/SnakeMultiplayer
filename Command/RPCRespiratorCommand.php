@@ -5,7 +5,7 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 /**
- * On production it accured that rpcs disappear after some idle time,
+ * On production it occured that rpcs disappear after some idle time,
  * command was created for cron job to ping all rpcs before they disappear
  * 
  */
