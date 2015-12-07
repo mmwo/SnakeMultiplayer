@@ -1,0 +1,106 @@
+{% extends "base.html.twig" %}
+{% block meta %}
+{{parent()}}
+<!-- set viewport to native resolution (android) - disable zoom !-->
+<meta name="viewport" content='width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0' />
+{% endblock meta %}
+{% block stylesheets %} 
+    {{ parent() }}
+    {% stylesheets '@GamesSnakeBundle/Resources/public/css/defaultStyle.css'
+                   '@AppBundle/Resources/public/css/user/login-page.css'  %}
+        <link href="{{ asset_url }}" rel="stylesheet" type="text/css" />
+    {% endstylesheets %}
+
+{% endblock stylesheets %}
+   
+{% block headScripts %}
+{{ parent() }}
+<script>
+    var CONST = (function(){
+        var private = {
+            user : "{% if app.user and is_granted('IS_AUTHENTICATED_FULLY') %}{{app.user.username}}{% else %}anonymous{%endif%}",
+            websiteUrl : "{{ websiteUrl }}"
+        };
+        return function(name){
+            return private[name];
+        }
+    })();
+</script>
+{% javascripts '@GamesSnakeBundle/Resources/public/js/app.js'
+               '@AppBundle/Resources/public/js/ngmodules/ui-bootstrap-tpls.min.js'
+               '@GamesSnakeBundle/Resources/public/js/factories/factories.js'
+               '@GamesSnakeBundle/Resources/public/js/directives/snakeNavigation.js'
+               '@GamesSnakeBundle/Resources/public/js/directives/gameMatching.js'
+               '@GamesSnakeBundle/Resources/public/js/controllers/game.js'
+               '@GamesSnakeBundle/Resources/public/js/filters/filters.js'
+                %}
+    <script src="{{ asset_url}}"></script>
+{% endjavascripts %}
+
+{% endblock %}
+
+{% block body %}
+    <div ng-app="snake">
+    <div class="container " ng-controller="game" >
+        <h2 class="" >Snake Multiplayer</h2>
+
+        <div class="well content "  snake-navigation>
+            {% if app.user and is_granted('IS_AUTHENTICATED_FULLY') %}
+            <game-matching ng-if="gameCreation"></game-matching>
+            {% endif %}
+            <div class="panel panel-danger game-end ng-cloak" ng-show="GameOverInfo">
+                <p class="big-satus">GAME OVER</p>
+                <button class="btn btn-lg btn-default center-block"
+                        ng-click="disableGameOverInfo()">
+                    Close!
+                </button>
+            </div>
+                
+            <div ng-repeat="field in fields track by $index" ng-cloak
+                 style='left: [[field.x]]px; top:[[field.y]]px;'
+                 class="[[field.className]] ">   
+            </div>
+        </div>
+        {% if app.user and is_granted("IS_AUTHENTICATED_FULLY") %}
+        <div class="well players ">
+            <div class="btn-group ">
+                <button class="btn btn-default" ng-class="{'btn-primary':isGame()}" ng-click="setPlayersListView('nowPlaying')">
+                    NowPlaying
+                </button>
+                <button class="btn btn-default" ng-click="setPlayersListView('online')">
+                    Online
+                <span class="label label-info ng-cloak" ng-hide="playersOnline() == 0">[[playersOnline()]]</span>
+                </button>
+            </div>
+            <div class="playersListView" ng-switch="playersListView" ng-cloak>
+                <table class="table" ng-switch-when="nowPlaying">
+                    <th>Players:</th><th>Score:</th>
+                    <tr ng-repeat="player in data.players |playerList:'nowPlaying'   track by $index ">
+                        <td>[[player.name]]</td>
+                        <td>[[player.score || 0]]</td>
+                    </tr>
+                </table>
+                <table class="table" ng-switch-when="online">
+                    <th>Players:</th>
+                    <tr ng-repeat="player in data.players |online | unique   track by $index ">
+                        <td ng-if="player.name != 'anonymous'? true:anonymousAppeared()">[[player.name]]</td>
+                    </tr>
+                    <tr ng-if="anonymousPlayers" >
+                        <td>At leas one anonymous</td>
+                    </tr>
+                </table>
+            </div>
+            <button class="btn btn-primary" ng-hide="isGame()" ng-disabled="gameCreation" ng-click="createGame()">Create game</button>
+
+        </div>
+        {% else %}
+            <div class="well players"><p><b>You must be logged in to play</b></p>
+            {% include 'AppBundle:Security:login-partial.html.twig' %}
+            </div>
+        {% endif %}
+        <iframe class="chat" src="{{path("games_chat_homepage", {room: "snake"})}}"
+                width="260" height="220" style="border:none;">
+        </iframe>
+    </div>
+    </div>
+{% endblock body %}

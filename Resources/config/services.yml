@@ -1,0 +1,13 @@
+services:
+#    games_snake.example:
+#        class: Games\SnakeBundle\Example
+#        arguments: [@service_id, "plain_value", %parameter%]
+    snake.player_manager:
+        class: Games\SnakeBundle\Utils\PlayerManager
+        arguments: [@snc_redis.default]
+    snake.board:
+        class: Games\SnakeBundle\Utils\SnakeBoard
+        arguments: [@snake.board_engine]
+    snake.board_engine:
+        class: Games\SnakeBundle\Utils\SnakeBoardEngine
+        

@@ -1,0 +1,17 @@
+Games\SnakeBundle\Entity\SnakeStartLocations:
+    type: entity
+    table: null
+    repositoryClass: Games\SnakeBundle\Entity\SnakeStartLocationsRepository
+    id:
+        id:
+            type: integer
+            id: true
+            generator:
+                strategy: AUTO
+    fields:
+        body:
+            type: text
+        className:
+            type: string
+            length: 50
+    lifecycleCallbacks: {  }

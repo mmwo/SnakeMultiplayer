@@ -1,0 +1,3 @@
+games_snake_homepage:
+    path:     /games/snake
+    defaults: { _controller: GamesSnakeBundle:Snake:index }
