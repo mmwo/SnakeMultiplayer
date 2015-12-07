@@ -9,7 +9,7 @@ class PlayerManager {
      */
     protected $redis;
     
-    public function __construct($redis) {
+    public function __construct(\Predis\Client $redis) {
         $this->redis = $redis;
     }
     
@@ -31,17 +31,10 @@ class PlayerManager {
         }
     }
 
-    public function savePlayers() {
-        
-        foreach($players as $id=>$player){   
-            $this->savePlayer($id, $player);
-        } 
-        
-    }
     public function getPlayers() {
         return $this->redis->hGetAll("snake.players");
     }
-    public function savePlayer($id, $player) {
+    protected function savePlayer($id, $player) {
         $this->redis->hSet("snake.players",$id, 
             json_encode(array(
                 "body" => $player->getBody(),
