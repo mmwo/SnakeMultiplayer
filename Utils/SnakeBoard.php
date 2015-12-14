@@ -8,7 +8,7 @@ class SnakeBoard  {
     const boardHeight = 500;
     const boardHeightPoints = 20;
     const distance = 25;
-    protected $forbiddenDirection = [ ["l","r"],["r","l"],["u","d"],["d","u"] ];
+    protected $forbiddenDirectionChange = [ ["l","r"],["r","l"],["u","d"],["d","u"] ];
     /**
      * @var SnakeBoardEngine engine of the board
      */
@@ -56,7 +56,7 @@ class SnakeBoard  {
     protected function createMotionModule(SnakePlayer $player, $direction) {
         $head = $player->getHead();
         $module = new \stdClass();
-        $direction = $this->calcDirection($direction, $player);
+        $direction = $this->calcDirection($direction, $head->d);
 
         switch ($direction){
             case "l" : $module->x = $head->x + minus(self::distance);
@@ -73,19 +73,12 @@ class SnakeBoard  {
 
         return $module;
     }
-    protected function calcDirection($direction, $player){
-        $action = array($direction,$player->getHead()->d );
+    protected function calcDirection($directionRequested, $headDirection){
+        $action = array($directionRequested, $headDirection );
         
-        // if(in_array($action,$this->forbiddenDirection){
-        //     $direction = $action[1];
-        // }
-        foreach($this->forbiddenDirection as $value){
-            if($action[0] == $value[0] && $action[1] == $value[1]){
-                return $value[1];
-            }
-        }
-
-        return $direction;
+         return (in_array($action,$this->forbiddenDirectionChange))
+                 ? $headDirection
+                 : $directionRequested;
     }
 }
 
