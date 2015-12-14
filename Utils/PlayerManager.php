@@ -53,7 +53,7 @@ class PlayerManager {
     }
     public function newPlayer($sessionId) {
 
-        if($this->redis->hLen("snake.players") < $this::MAX_PLAYERS && 
+        if($this->redis->hLen("snake.players") <= $this::MAX_PLAYERS && 
                 !$this->redis->hExists("snake.players", $sessionId)){
             
             $location = $this->getNewSnakeLocation();
@@ -66,7 +66,7 @@ class PlayerManager {
             }
         }
     }
-    public function resetGame($snakeInitLocations) {
+    public function resetGame(array $snakeInitLocations) {
         $bugs = [
                     ['x'=>50,  'y'=>25,  'className'=>'bug'],
                     ['x'=>25,  'y'=>400, 'className'=>'bug'],
